@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Morse Code Master</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            margin-bottom: 30px;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            background-color: var(--light);
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--dark);
+            transition: all 0.3s ease;
+            border-radius: 5px 5px 0 0;
+            margin: 0 5px;
+        }
+
+        .tab-btn.active {
+            background-color: var(--secondary);
+            color: white;
+        }
+
+        .tab-btn:hover:not(.active) {
+            background-color: #d6eaf8;
+        }
+
+        .tab-content {
+            display: none;
+            background-color: white;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: var(--primary);
+            border-bottom: 2px solid var(--secondary);
+            padding-bottom: 10px;
+        }
+
+        .morse-chart {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .morse-item {
+            background-color: var(--light);
+            padding: 15px;
+            border-radius: 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.3s ease;
+        }
+
+        .morse-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .morse-char {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .morse-code {
+            font-family: monospace;
+            font-size: 1.2rem;
+            color: var(--secondary);
+        }
+
+        .practice-area {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .practice-mode-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .practice-btn {
+            padding: 10px 20px;
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .practice-btn:hover {
+            background-color: #2980b9;
+        }
+
+        .practice-btn.active {
+            background-color: var(--primary);
+        }
+
+        .practice-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .practice-question {
+            font-size: 2rem;
+            text-align: center;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--light);
+            padding: 20px;
+            border-radius: 5px;
+        }
+
+        .practice-answer {
+            display: flex;
+            gap: 10px;
+        }
+
+        .practice-answer input {
+            flex: 1;
+            padding: 15px;
+            font-size: 1.2rem;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .practice-answer input:focus {
+            border-color: var(--secondary);
+        }
+
+        .practice-answer button {
+            padding: 0 20px;
+            background-color: var(--success);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .practice-answer button:hover {
+            background-color: #27ae60;
+        }
+
+        .practice-feedback {
+            text-align: center;
+            font-size: 1.2rem;
+            min-height: 30px;
+        }
+
+        .practice-feedback.correct {
+            color: var(--success);
+        }
+
+        .practice-feedback.incorrect {
+            color: var(--danger);
+        }
+
+        .translation-area {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .translation-boxes {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .translation-box {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .translation-box h3 {
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 15px;
+            font-size: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            resize: vertical;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        textarea:focus {
+            border-color: var(--secondary);
+        }
+
+        .translation-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .translation-btn {
+            padding: 12px 24px;
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .translation-btn:hover {
+            background-color: #2980b9;
+        }
+
+        .translation-btn.clear {
+            background-color: var(--danger);
+        }
+
+        .translation-btn.clear:hover {
+            background-color: #c0392b;
+        }
+
+        .sound-controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .sound-btn {
+            padding: 10px 20px;
+            background-color: var(--warning);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .sound-btn:hover {
+            background-color: #e67e22;
+        }
+
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .speed-control label {
+            font-weight: 600;
+        }
+
+        .speed-control input {
+            width: 100px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            color: var(--dark);
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .morse-chart {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+
+            .translation-boxes {
+                flex-direction: column;
+            }
+
+            .translation-box {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Morse Code Master</h1>
+            <p class="subtitle">Learn, practice, and translate Morse code</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="learn">Learn</button>
+            <button class="tab-btn" data-tab="practice">Practice</button>
+            <button class="tab-btn" data-tab="translate">Translate</button>
+        </div>
+
+        <div id="learn" class="tab-content active">
+            <h2>Morse Code Chart</h2>
+            <p>Study the Morse code representations for letters, numbers, and common punctuation below.</p>
+            
+            <h3>Letters</h3>
+            <div class="morse-chart" id="letters-chart"></div>
+            
+            <h3>Numbers</h3>
+            <div class="morse-chart" id="numbers-chart"></div>
+            
+            <h3>Punctuation</h3>
+            <div class="morse-chart" id="punctuation-chart"></div>
+        </div>
+
+        <div id="practice" class="tab-content">
+            <h2>Practice Morse Code</h2>
+            <p>Test your knowledge by translating between text and Morse code.</p>
+            
+            <div class="practice-area">
+                <div class="practice-mode-selector">
+                    <button class="practice-btn active" data-mode="text-to-morse">Text to Morse</button>
+                    <button class="practice-btn" data-mode="morse-to-text">Morse to Text</button>
+                </div>
+                
+                <div class="practice-container">
+                    <div class="practice-question" id="practice-question"></div>
+                    <div class="practice-answer">
+                        <input type="text" id="practice-input" placeholder="Your answer...">
+                        <button id="check-answer">Check</button>
+                    </div>
+                    <div class="practice-feedback" id="practice-feedback"></div>
+                </div>
+                
+                <div class="sound-controls">
+                    <button class="sound-btn" id="play-question">Play Question</button>
+                    <div class="speed-control">
+                        <label for="speed">Speed:</label>
+                        <input type="range" id="speed" min="5" max="30" value="15">
+                        <span id="speed-value">15 WPM</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="translate" class="tab-content">
+            <h2>Morse Code Translator</h2>
+            <p>Translate between text and Morse code in real time.</p>
+            
+            <div class="translation-area">
+                <div class="translation-boxes">
+                    <div class="translation-box">
+                        <h3>Text</h3>
+                        <textarea id="text-input" placeholder="Enter text here..."></textarea>
+                    </div>
+                    <div class="translation-box">
+                        <h3>Morse Code</h3>
+                        <textarea id="morse-input" placeholder="Enter Morse code here (use . and -, separate letters with space, words with /)"></textarea>
+                    </div>
+                </div>
+                
+                <div class="translation-buttons">
+                    <button class="translation-btn" id="text-to-morse-btn">Text → Morse</button>
+                    <button class="translation-btn" id="morse-to-text-btn">Morse → Text</button>
+                    <button class="translation-btn clear" id="clear-btn">Clear All</button>
+                </div>
+                
+                <div class="sound-controls">
+                    <button class="sound-btn" id="play-text">Play Text as Morse</button>
+                    <div class="speed-control">
+                        <label for="translation-speed">Speed:</label>
+                        <input type="range" id="translation-speed" min="5" max="30" value="15">
+                        <span id="translation-speed-value">15 WPM</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Morse Code Master &copy; 2023 | Created with HTML, CSS, and JavaScript</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Morse code data
+            const morseCode = {
+                // Letters
+                'A': '.-', 'B': '-...', 'C': '-.-.', 'D': '-..', 'E': '.', 
+                'F': '..-.', 'G': '--.', 'H': '....', 'I': '..', 'J': '.---', 
+                'K': '-.-', 'L': '.-..', 'M': '--', 'N': '-.', 'O': '---', 
+                'P': '.--.', 'Q': '--.-', 'R': '.-.', 'S': '...', 'T': '-', 
+                'U': '..-', 'V': '...-', 'W': '.--', 'X': '-..-', 'Y': '-.--', 
+                'Z': '--..',
+                
+                // Numbers
+                '0': '-----', '1': '.----', '2': '..---', '3': '...--', 
+                '4': '....-', '5': '.....', '6': '-....', '7': '--...', 
+                '8': '---..', '9': '----.',
+                
+                // Punctuation
+                '.': '.-.-.-', ',': '--..--', '?': '..--..', "'": '.----.', 
+                '!': '-.-.--', '/': '-..-.', '(': '-.--.', ')': '-.--.-', 
+                '&': '.-...', ':': '---...', ';': '-.-.-.', '=': '-...-', 
+                '+': '.-.-.', '-': '-....-', '_': '..--.-', '"': '.-..-.', 
+                '$': '...-..-', '@': '.--.-.', ' ': '/'
+            };
+
+            // Reverse Morse code lookup
+            const reverseMorse = {};
+            for (const key in morseCode) {
+                reverseMorse[morseCode[key]] = key;
+            }
+
+            // Tab functionality
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tabId = btn.getAttribute('data-tab');
+                    
+                    // Update active tab button
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    // Update active tab content
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    document.getElementById(tabId).classList.add('active');
+                    
+                    // If switching to practice tab, generate a new question
+                    if (tabId === 'practice') {
+                        generatePracticeQuestion();
+                    }
+                });
+            });
+
+            // Populate Morse code charts
+            function populateMorseCharts() {
+                const lettersChart = document.getElementById('letters-chart');
+                const numbersChart = document.getElementById('numbers-chart');
+                const punctuationChart = document.getElementById('punctuation-chart');
+                
+                // Add letters
+                for (let i = 65; i <= 90; i++) {
+                    const char = String.fromCharCode(i);
+                    lettersChart.appendChild(createMorseItem(char, morseCode[char]));
+                }
+                
+                // Add numbers
+                for (let i = 0; i <= 9; i++) {
+                    numbersChart.appendChild(createMorseItem(i.toString(), morseCode[i.toString()]));
+                }
+                
+                // Add punctuation (filter out space)
+                const punctuation = Object.keys(morseCode).filter(key => 
+                    key.length === 1 && !/[A-Z0-9]/.test(key) && key !== ' '
+                );
+                
+                punctuation.forEach(char => {
+                    punctuationChart.appendChild(createMorseItem(char, morseCode[char]));
+                });
+            }
+            
+            function createMorseItem(char, code) {
+                const item = document.createElement('div');
+                item.className = 'morse-item';
+                
+                const charEl = document.createElement('div');
+                charEl.className = 'morse-char';
+                charEl.textContent = char;
+                
+                const codeEl = document.createElement('div');
+                codeEl.className = 'morse-code';
+                codeEl.textContent = code;
+                
+                item.appendChild(charEl);
+                item.appendChild(codeEl);
+                
+                return item;
+            }
+
+            // Practice functionality
+            const practiceModeBtns = document.querySelectorAll('.practice-btn');
+            let currentPracticeMode = 'text-to-morse';
+            
+            practiceModeBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    practiceModeBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentPracticeMode = btn.getAttribute('data-mode');
+                    generatePracticeQuestion();
+                });
+            });
+            
+            function generatePracticeQuestion() {
+                const questionEl = document.getElementById('practice-question');
+                const inputEl = document.getElementById('practice-input');
+                const feedbackEl = document.getElementById('practice-feedback');
+                
+                inputEl.value = '';
+                feedbackEl.textContent = '';
+                feedbackEl.className = 'practice-feedback';
+                
+                if (currentPracticeMode === 'text-to-morse') {
+                    // Generate random letter, number, or punctuation
+                    const chars = Object.keys(morseCode).filter(c => c !== ' ');
+                    const randomChar = chars[Math.floor(Math.random() * chars.length)];
+                    questionEl.textContent = randomChar;
+                } else {
+                    // Generate random Morse code
+                    const codes = Object.values(morseCode).filter(c => c !== '/');
+                    const randomCode = codes[Math.floor(Math.random() * codes.length)];
+                    questionEl.textContent = randomCode;
+                }
+            }
+            
+            document.getElementById('check-answer').addEventListener('click', checkAnswer);
+            document.getElementById('practice-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    checkAnswer();
+                }
+            });
+            
+            function checkAnswer() {
+                const questionEl = document.getElementById('practice-question');
+                const inputEl = document.getElementById('practice-input');
+                const feedbackEl = document.getElementById('practice-feedback');
+                
+                const question = questionEl.textContent.trim();
+                const answer = inputEl.value.trim();
+                
+                if (!answer) {
+                    feedbackEl.textContent = 'Please enter an answer';
+                    feedbackEl.className = 'practice-feedback incorrect';
+                    return;
+                }
+                
+                let correctAnswer;
+                if (currentPracticeMode === 'text-to-morse') {
+                    correctAnswer = morseCode[question.toUpperCase()] || morseCode[question];
+                } else {
+                    correctAnswer = reverseMorse[question] || '?';
+                }
+                
+                if (answer.toUpperCase() === correctAnswer.toUpperCase()) {
+                    feedbackEl.textContent = 'Correct!';
+                    feedbackEl.className = 'practice-feedback correct';
+                    setTimeout(generatePracticeQuestion, 1500);
+                } else {
+                    feedbackEl.textContent = `Incorrect. The correct answer is "${correctAnswer}"`;
+                    feedbackEl.className = 'practice-feedback incorrect';
+                }
+            }
+
+            // Translation functionality
+            document.getElementById('text-to-morse-btn').addEventListener('click', textToMorse);
+            document.getElementById('morse-to-text-btn').addEventListener('click', morseToText);
+            document.getElementById('clear-btn').addEventListener('click', clearTranslation);
+            
+            function textToMorse() {
+                const textInput = document.getElementById('text-input').value.toUpperCase();
+                let morseOutput = '';
+                
+                for (const char of textInput) {
+                    if (morseCode[char]) {
+                        morseOutput += morseCode[char] + ' ';
+                    } else if (char === ' ') {
+                        morseOutput += '/ ';
+                    }
+                }
+                
+                document.getElementById('morse-input').value = morseOutput.trim();
+            }
+            
+            function morseToText() {
+                const morseInput = document.getElementById('morse-input').value.trim();
+                const morseWords = morseInput.split('/');
+                let textOutput = '';
+                
+                for (const word of morseWords) {
+                    const letters = word.trim().split(' ');
+                    for (const letter of letters) {
+                        if (reverseMorse[letter]) {
+                            textOutput += reverseMorse[letter];
+                        }
+                    }
+                    textOutput += ' ';
+                }
+                
+                document.getElementById('text-input').value = textOutput.trim();
+            }
+            
+            function clearTranslation() {
+                document.getElementById('text-input').value = '';
+                document.getElementById('morse-input').value = '';
+            }
+
+            // Sound functionality
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            const audioCtx = new AudioContext();
+            let isPlaying = false;
+            
+            document.getElementById('play-question').addEventListener('click', playQuestion);
+            document.getElementById('play-text').addEventListener('click', playTextAsMorse);
+            
+            // Speed controls
+            const speedControl = document.getElementById('speed');
+            const speedValue = document.getElementById('speed-value');
+            const translationSpeedControl = document.getElementById('translation-speed');
+            const translationSpeedValue = document.getElementById('translation-speed-value');
+            
+            speedControl.addEventListener('input', () => {
+                speedValue.textContent = `${speedControl.value} WPM`;
+            });
+            
+            translationSpeedControl.addEventListener('input', () => {
+                translationSpeedValue.textContent = `${translationSpeedControl.value} WPM`;
+            });
+            
+            function playQuestion() {
+                if (isPlaying) return;
+                
+                const questionEl = document.getElementById('practice-question');
+                const question = questionEl.textContent.trim();
+                const speed = parseInt(speedControl.value);
+                
+                if (currentPracticeMode === 'text-to-morse') {
+                    playMorseCode(morseCode[question.toUpperCase()] || morseCode[question], speed);
+                } else {
+                    playMorseCode(question, speed);
+                }
+            }
+            
+            function playTextAsMorse() {
+                if (isPlaying) return;
+                
+                const textInput = document.getElementById('text-input').value.toUpperCase();
+                const speed = parseInt(translationSpeedControl.value);
+                let morseString = '';
+                
+                for (const char of textInput) {
+                    if (morseCode[char]) {
+                        morseString += morseCode[char] + ' ';
+                    } else if (char === ' ') {
+                        morseString += '/ ';
+                    }
+                }
+                
+                playMorseCode(morseString.trim(), speed);
+            }
+            
+            function playMorseCode(morseString, wpm = 15) {
+                if (!morseString || isPlaying) return;
+                
+                isPlaying = true;
+                const dotDuration = 1.2 / wpm; // Standard timing for Morse code
+                const dashDuration = 3 * dotDuration;
+                const symbolSpace = dotDuration;
+                const letterSpace = 3 * dotDuration - symbolSpace; // Already has space after each symbol
+                const wordSpace = 7 * dotDuration - letterSpace; // Already has space after each letter
+                
+                let time = audioCtx.currentTime + 0.1; // Short delay before starting
+                
+                for (const char of morseString) {
+                    if (char === '.') {
+                        playBeep(time, dotDuration);
+                        time += dotDuration + symbolSpace;
+                    } else if (char === '-') {
+                        playBeep(time, dashDuration);
+                        time += dashDuration + symbolSpace;
+                    } else if (char === ' ') {
+                        time += letterSpace;
+                    } else if (char === '/') {
+                        time += wordSpace;
+                    }
+                }
+                
+                setTimeout(() => { isPlaying = false; }, (time - audioCtx.currentTime) * 1000);
+            }
+            
+            function playBeep(startTime, duration) {
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                
+                oscillator.type = 'sine';
+                oscillator.frequency.value = 700;
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                
+                oscillator.start(startTime);
+                oscillator.stop(startTime + duration);
+                
+                // Apply a quick fade out to avoid clicks
+                gainNode.gain.setValueAtTime(0.3, startTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+            }
+
+            // Initialize the app
+            populateMorseCharts();
+            generatePracticeQuestion();
+        });
+    </script>
+</body>
+</html>

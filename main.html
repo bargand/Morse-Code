@@ -1,0 +1,2058 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Morse Code Master Pro</title>
+    <style>
+      :root {
+        --primary: #2c3e50;
+        --primary-dark: #1a252f;
+        --secondary: #3498db;
+        --secondary-dark: #2980b9;
+        --light: #ecf0f1;
+        --dark: #2c3e50;
+        --success: #2ecc71;
+        --success-dark: #27ae60;
+        --warning: #f39c12;
+        --warning-dark: #e67e22;
+        --danger: #e74c3c;
+        --danger-dark: #c0392b;
+        --info: #1abc9c;
+        --info-dark: #16a085;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      body {
+        background-color: var(--light);
+        color: var(--dark);
+        line-height: 1.6;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      header {
+        background: linear-gradient(
+          135deg,
+          var(--primary),
+          var(--primary-dark)
+        );
+        color: white;
+        padding: 25px 0;
+        text-align: center;
+        margin-bottom: 30px;
+        border-radius: 8px;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        position: relative;
+        overflow: hidden;
+      }
+
+      header::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(
+          90deg,
+          var(--secondary),
+          var(--info),
+          var(--success)
+        );
+      }
+
+      h1 {
+        font-size: 2.8rem;
+        margin-bottom: 10px;
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+      }
+
+      .subtitle {
+        font-size: 1.3rem;
+        opacity: 0.9;
+        max-width: 800px;
+        margin: 0 auto;
+      }
+
+      .stats-bar {
+        display: flex;
+        justify-content: space-between;
+        background-color: white;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+      }
+
+      .stat-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0 15px;
+      }
+
+      .stat-value {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: var(--primary);
+      }
+
+      .stat-label {
+        font-size: 0.9rem;
+        color: var(--primary);
+        opacity: 0.8;
+      }
+
+      .tabs {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+        gap: 5px;
+      }
+
+      .tab-btn {
+        padding: 14px 28px;
+        background-color: var(--light);
+        border: none;
+        cursor: pointer;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--dark);
+        transition: all 0.3s ease;
+        border-radius: 8px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .tab-btn::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background-color: var(--secondary);
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+        transform-origin: center;
+      }
+
+      .tab-btn.active {
+        background-color: white;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .tab-btn.active::after {
+        transform: scaleX(1);
+      }
+
+      .tab-btn:hover:not(.active) {
+        background-color: #d6eaf8;
+      }
+
+      .tab-content {
+        display: none;
+        background-color: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        animation: fadeIn 0.5s ease;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .tab-content.active {
+        display: block;
+      }
+
+      h2 {
+        margin-bottom: 25px;
+        color: var(--primary);
+        padding-bottom: 10px;
+        border-bottom: 2px solid var(--secondary);
+        display: inline-block;
+      }
+
+      h3 {
+        margin: 20px 0 15px;
+        color: var(--primary-dark);
+      }
+
+      .morse-chart {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 18px;
+        margin-bottom: 35px;
+      }
+
+      .morse-item {
+        background-color: var(--light);
+        padding: 18px;
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .morse-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .morse-item.active {
+        background-color: #e8f4fc;
+        border: 2px solid var(--secondary);
+      }
+
+      .morse-char {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 8px;
+      }
+
+      .morse-code {
+        font-family: monospace;
+        font-size: 1.3rem;
+        color: var(--secondary);
+        font-weight: 600;
+      }
+
+      .practice-area {
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+      }
+
+      .practice-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+      }
+
+      .progress-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .progress-bar {
+        height: 10px;
+        width: 200px;
+        background-color: #e0e0e0;
+        border-radius: 5px;
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--success), var(--info));
+        width: 0%;
+        transition: width 0.5s ease;
+      }
+
+      .difficulty-selector {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+      }
+
+      .difficulty-btn {
+        padding: 10px 20px;
+        background-color: var(--light);
+        color: var(--dark);
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+      }
+
+      .difficulty-btn.active {
+        background-color: var(--secondary);
+        color: white;
+        border-color: var(--secondary-dark);
+      }
+
+      .difficulty-btn:hover:not(.active) {
+        background-color: #d6eaf8;
+      }
+
+      .practice-mode-selector {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+      }
+
+      .practice-btn {
+        padding: 12px 24px;
+        background-color: var(--light);
+        color: var(--dark);
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .practice-btn.active {
+        background-color: var(--primary);
+        color: white;
+      }
+
+      .practice-btn:hover:not(.active) {
+        background-color: #d6eaf8;
+      }
+
+      .practice-container {
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+        background-color: var(--light);
+        padding: 30px;
+        border-radius: 8px;
+      }
+
+      .practice-question-container {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .question-label {
+        font-size: 1.1rem;
+        color: var(--primary-dark);
+        font-weight: 600;
+      }
+
+      .practice-question {
+        font-size: 2.5rem;
+        text-align: center;
+        min-height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: white;
+        padding: 25px;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        font-family: monospace;
+      }
+
+      .practice-answer {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+      }
+
+      .practice-answer input {
+        flex: 1;
+        min-width: 200px;
+        padding: 18px;
+        font-size: 1.3rem;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        outline: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+      }
+
+      .practice-answer input:focus {
+        border-color: var(--secondary);
+        box-shadow: 0 4px 8px rgba(52, 152, 219, 0.2);
+      }
+
+      .practice-answer button {
+        padding: 0 28px;
+        background-color: var(--success);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .practice-answer button:hover {
+        background-color: var(--success-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      }
+
+      .practice-feedback {
+        text-align: center;
+        font-size: 1.3rem;
+        min-height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 15px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+      }
+
+      .practice-feedback.correct {
+        background-color: rgba(46, 204, 113, 0.1);
+        color: var(--success-dark);
+      }
+
+      .practice-feedback.incorrect {
+        background-color: rgba(231, 76, 60, 0.1);
+        color: var(--danger-dark);
+      }
+
+      .hint-area {
+        margin-top: 15px;
+        display: none;
+      }
+
+      .hint-btn {
+        background-color: transparent;
+        border: none;
+        color: var(--warning-dark);
+        cursor: pointer;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin-bottom: 10px;
+      }
+
+      .hint-content {
+        background-color: rgba(243, 156, 18, 0.1);
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 4px solid var(--warning);
+      }
+
+      .sound-controls {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        margin-top: 25px;
+        flex-wrap: wrap;
+      }
+
+      .sound-btn {
+        padding: 12px 24px;
+        background-color: var(--warning);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .sound-btn:hover {
+        background-color: var(--warning-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      }
+
+      .speed-control {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background-color: white;
+        padding: 10px 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .speed-control label {
+        font-weight: 600;
+        color: var(--primary-dark);
+      }
+
+      .speed-control input {
+        width: 120px;
+      }
+
+      .speed-value {
+        min-width: 50px;
+        text-align: center;
+      }
+
+      .translation-area {
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+      }
+
+      .translation-boxes {
+        display: flex;
+        gap: 25px;
+        flex-wrap: wrap;
+      }
+
+      .translation-box {
+        flex: 1;
+        min-width: 300px;
+      }
+
+      .translation-box h3 {
+        margin-bottom: 15px;
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      textarea {
+        width: 100%;
+        height: 250px;
+        padding: 20px;
+        font-size: 1.1rem;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        resize: vertical;
+        outline: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        line-height: 1.6;
+      }
+
+      textarea:focus {
+        border-color: var(--secondary);
+        box-shadow: 0 4px 8px rgba(52, 152, 219, 0.2);
+      }
+
+      .translation-buttons {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .translation-btn {
+        padding: 14px 28px;
+        background-color: var(--secondary);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .translation-btn:hover {
+        background-color: var(--secondary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      }
+
+      .translation-btn.clear {
+        background-color: var(--danger);
+      }
+
+      .translation-btn.clear:hover {
+        background-color: var(--danger-dark);
+      }
+
+      .translation-btn.info {
+        background-color: var(--info);
+      }
+
+      .translation-btn.info:hover {
+        background-color: var(--info-dark);
+      }
+
+      footer {
+        text-align: center;
+        margin-top: 50px;
+        padding: 25px;
+        color: var(--dark);
+        opacity: 0.8;
+        font-size: 0.9rem;
+      }
+
+      /* Animation classes */
+      .pulse {
+        animation: pulse 1s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .shake {
+        animation: shake 0.5s;
+      }
+
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        10%,
+        30%,
+        50%,
+        70%,
+        90% {
+          transform: translateX(-5px);
+        }
+        20%,
+        40%,
+        60%,
+        80% {
+          transform: translateX(5px);
+        }
+      }
+
+      /* Tooltip */
+      .tooltip {
+        position: relative;
+        display: inline-block;
+      }
+
+      .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 200px;
+        background-color: var(--primary-dark);
+        color: white;
+        text-align: center;
+        border-radius: 6px;
+        padding: 10px;
+        position: absolute;
+        z-index: 1;
+        bottom: 125%;
+        left: 50%;
+        transform: translateX(-50%);
+        opacity: 0;
+        transition: opacity 0.3s;
+        font-size: 0.9rem;
+        font-weight: normal;
+      }
+
+      .tooltip .tooltiptext::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: var(--primary-dark) transparent transparent transparent;
+      }
+
+      .tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 768px) {
+        .morse-chart {
+          grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        }
+
+        .translation-boxes {
+          flex-direction: column;
+        }
+
+        .translation-box {
+          min-width: 100%;
+        }
+
+        .practice-answer {
+          flex-direction: column;
+        }
+
+        .practice-answer input {
+          min-width: 100%;
+        }
+
+        .practice-answer button {
+          width: 100%;
+          justify-content: center;
+          padding: 15px;
+        }
+
+        header {
+          padding: 20px 15px;
+        }
+
+        h1 {
+          font-size: 2rem;
+        }
+
+        .subtitle {
+          font-size: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>Morse Code Master Pro</h1>
+        <p class="subtitle">
+          The ultimate interactive learning experience for mastering Morse code
+          communication
+        </p>
+      </header>
+
+      <div class="stats-bar">
+        <div class="stat-item">
+          <div class="stat-value" id="streak-count">0</div>
+          <div class="stat-label">Day Streak</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="total-correct">0</div>
+          <div class="stat-label">Correct Answers</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="accuracy-rate">0%</div>
+          <div class="stat-label">Accuracy</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="level-display">1</div>
+          <div class="stat-label">Level</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="xp-display">0/100</div>
+          <div class="stat-label">XP</div>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="learn">
+          <i class="icon-learn">📚</i> Learn
+        </button>
+        <button class="tab-btn" data-tab="practice">
+          <i class="icon-practice">🏋️</i> Practice
+        </button>
+        <button class="tab-btn" data-tab="translate">
+          <i class="icon-translate">🔄</i> Translate
+        </button>
+        <button class="tab-btn" data-tab="progress">
+          <i class="icon-progress">📈</i> Progress
+        </button>
+      </div>
+
+      <div id="learn" class="tab-content active">
+        <h2>Morse Code Reference</h2>
+        <p>
+          Click on any character to hear its Morse code sound. Study the
+          patterns to recognize them faster.
+        </p>
+
+        <div class="difficulty-selector">
+          <button class="difficulty-btn active" data-difficulty="all">
+            All Characters
+          </button>
+          <button class="difficulty-btn" data-difficulty="letters">
+            Letters Only
+          </button>
+          <button class="difficulty-btn" data-difficulty="numbers">
+            Numbers Only
+          </button>
+          <button class="difficulty-btn" data-difficulty="punctuation">
+            Punctuation
+          </button>
+        </div>
+
+        <h3>Letters</h3>
+        <div class="morse-chart" id="letters-chart"></div>
+
+        <h3>Numbers</h3>
+        <div class="morse-chart" id="numbers-chart"></div>
+
+        <h3>Punctuation</h3>
+        <div class="morse-chart" id="punctuation-chart"></div>
+
+        <h3>Learning Tips</h3>
+        <div class="tips-container">
+          <div class="tip-card">
+            <h4>Start with simple letters</h4>
+            <p>
+              Begin with letters that have short codes like E (.), T (-), I
+              (..), and M (--).
+            </p>
+          </div>
+          <div class="tip-card">
+            <h4>Look for patterns</h4>
+            <p>
+              Notice that many letters build on each other. For example: E (.),
+              I (..), S (...), H (....).
+            </p>
+          </div>
+          <div class="tip-card">
+            <h4>Practice daily</h4>
+            <p>
+              Consistent short practice sessions are more effective than
+              occasional long ones.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div id="practice" class="tab-content">
+        <div class="practice-header">
+          <h2>Practice Mode</h2>
+          <div class="progress-container">
+            <span id="progress-text">0/10</span>
+            <div class="progress-bar">
+              <div class="progress-fill" id="progress-fill"></div>
+            </div>
+          </div>
+        </div>
+
+        <p>
+          Select your practice mode and difficulty level. Earn XP for correct
+          answers!
+        </p>
+
+        <div class="difficulty-selector">
+          <button class="difficulty-btn active" data-level="beginner">
+            Beginner (Letters)
+          </button>
+          <button class="difficulty-btn" data-level="intermediate">
+            Intermediate (Letters + Numbers)
+          </button>
+          <button class="difficulty-btn" data-level="advanced">
+            Advanced (All Characters)
+          </button>
+        </div>
+
+        <div class="practice-mode-selector">
+          <button class="practice-btn active" data-mode="text-to-morse">
+            <i class="icon-mode">🔤</i> Text to Morse
+          </button>
+          <button class="practice-btn" data-mode="morse-to-text">
+            <i class="icon-mode">.-.</i> Morse to Text
+          </button>
+          <button class="practice-btn" data-mode="audio-recognition">
+            <i class="icon-mode">🔊</i> Audio Recognition
+          </button>
+        </div>
+
+        <div class="practice-container">
+          <div class="practice-question-container">
+            <div class="question-label">Translate this:</div>
+            <div class="practice-question" id="practice-question"></div>
+          </div>
+
+          <div class="practice-answer">
+            <input
+              type="text"
+              id="practice-input"
+              placeholder="Type your answer here..."
+            />
+            <button id="check-answer">
+              <i class="icon-check">✓</i> Check Answer
+            </button>
+          </div>
+
+          <div class="practice-feedback" id="practice-feedback"></div>
+
+          <div class="hint-area" id="hint-area">
+            <button class="hint-btn" id="hint-btn">
+              <i class="icon-hint">💡</i> Need a hint?
+            </button>
+            <div class="hint-content" id="hint-content"></div>
+          </div>
+        </div>
+
+        <div class="sound-controls">
+          <button class="sound-btn" id="play-question">
+            <i class="icon-sound">🔊</i> Play Question
+          </button>
+          <button class="sound-btn" id="repeat-last">
+            <i class="icon-repeat">↻</i> Repeat Last
+          </button>
+          <div class="speed-control">
+            <label for="speed">Speed:</label>
+            <input type="range" id="speed" min="5" max="30" value="15" />
+            <span class="speed-value" id="speed-value">15 WPM</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="translate" class="tab-content">
+        <h2>Real-time Translator</h2>
+        <p>
+          Convert between text and Morse code instantly. Great for decoding
+          messages or practicing sending.
+        </p>
+
+        <div class="translation-area">
+          <div class="translation-boxes">
+            <div class="translation-box">
+              <h3><i class="icon-text">🔤</i> Text</h3>
+              <textarea
+                id="text-input"
+                placeholder="Type your text here..."
+              ></textarea>
+            </div>
+            <div class="translation-box">
+              <h3><i class="icon-morse">.-.</i> Morse Code</h3>
+              <textarea
+                id="morse-input"
+                placeholder="Enter Morse code here (use . and -, separate letters with space, words with /)"
+              ></textarea>
+            </div>
+          </div>
+
+          <div class="translation-buttons">
+            <button class="translation-btn" id="text-to-morse-btn">
+              <i class="icon-convert">→</i> Text → Morse
+            </button>
+            <button class="translation-btn" id="morse-to-text-btn">
+              <i class="icon-convert">←</i> Morse → Text
+            </button>
+            <button class="translation-btn clear" id="clear-btn">
+              <i class="icon-clear">🗑️</i> Clear All
+            </button>
+            <button class="translation-btn info" id="format-help-btn">
+              <i class="icon-help">?</i> Format Help
+            </button>
+          </div>
+
+          <div class="sound-controls">
+            <button class="sound-btn" id="play-text">
+              <i class="icon-sound">🔊</i> Play Text as Morse
+            </button>
+            <div class="speed-control">
+              <label for="translation-speed">Speed:</label>
+              <input
+                type="range"
+                id="translation-speed"
+                min="5"
+                max="30"
+                value="15"
+              />
+              <span class="speed-value" id="translation-speed-value"
+                >15 WPM</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="translation-tips">
+          <h3>Translation Tips</h3>
+          <ul>
+            <li>Letters in Morse code are separated by single spaces</li>
+            <li>Words are separated by forward slashes (/)</li>
+            <li>For audio playback, punctuation will be treated as pauses</li>
+            <li>Use uppercase letters for consistent translation</li>
+          </ul>
+        </div>
+      </div>
+
+      <div id="progress" class="tab-content">
+        <h2>Your Learning Progress</h2>
+        <p>Track your improvement and see which characters you've mastered.</p>
+
+        <div class="progress-stats">
+          <div class="stat-card">
+            <h3>Today's Practice</h3>
+            <div class="stat-value" id="today-correct">0</div>
+            <div class="stat-label">Correct Answers</div>
+          </div>
+          <div class="stat-card">
+            <h3>Current Streak</h3>
+            <div class="stat-value" id="current-streak">0</div>
+            <div class="stat-label">Days</div>
+          </div>
+          <div class="stat-card">
+            <h3>Total Practice</h3>
+            <div class="stat-value" id="total-answered">0</div>
+            <div class="stat-label">Questions Answered</div>
+          </div>
+        </div>
+
+        <h3>Character Mastery</h3>
+        <div class="mastery-chart" id="mastery-chart"></div>
+
+        <h3>Achievements</h3>
+        <div class="achievements-grid" id="achievements-grid"></div>
+
+        <h3>Daily Goal</h3>
+        <div class="daily-goal">
+          <div class="goal-progress">
+            <div class="progress-bar">
+              <div class="progress-fill" id="daily-goal-progress"></div>
+            </div>
+            <span id="daily-goal-text">0/10 correct answers today</span>
+          </div>
+          <button class="sound-btn" id="set-goal-btn">
+            <i class="icon-goal">🎯</i> Set Daily Goal
+          </button>
+        </div>
+      </div>
+
+      <footer>
+        <p>
+          Morse Code Master Pro &copy; 2023 | An interactive learning tool for
+          mastering Morse code
+        </p>
+        <p class="tooltip">
+          Did you know?
+          <span class="tooltiptext"
+            >The first Morse code message was sent in 1844 by Samuel Morse with
+            the phrase "What hath God wrought"</span
+          >
+        </p>
+      </footer>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Morse code data with additional metadata
+        const morseData = {
+          // Letters
+          A: { code: ".-", difficulty: 1, mastery: 0 },
+          B: { code: "-...", difficulty: 2, mastery: 0 },
+          C: { code: "-.-.", difficulty: 3, mastery: 0 },
+          D: { code: "-..", difficulty: 2, mastery: 0 },
+          E: { code: ".", difficulty: 1, mastery: 0 },
+          F: { code: "..-.", difficulty: 3, mastery: 0 },
+          G: { code: "--.", difficulty: 2, mastery: 0 },
+          H: { code: "....", difficulty: 2, mastery: 0 },
+          I: { code: "..", difficulty: 1, mastery: 0 },
+          J: { code: ".---", difficulty: 4, mastery: 0 },
+          K: { code: "-.-", difficulty: 2, mastery: 0 },
+          L: { code: ".-..", difficulty: 3, mastery: 0 },
+          M: { code: "--", difficulty: 1, mastery: 0 },
+          N: { code: "-.", difficulty: 1, mastery: 0 },
+          O: { code: "---", difficulty: 2, mastery: 0 },
+          P: { code: ".--.", difficulty: 3, mastery: 0 },
+          Q: { code: "--.-", difficulty: 4, mastery: 0 },
+          R: { code: ".-.", difficulty: 2, mastery: 0 },
+          S: { code: "...", difficulty: 1, mastery: 0 },
+          T: { code: "-", difficulty: 1, mastery: 0 },
+          U: { code: "..-", difficulty: 2, mastery: 0 },
+          V: { code: "...-", difficulty: 3, mastery: 0 },
+          W: { code: ".--", difficulty: 2, mastery: 0 },
+          X: { code: "-..-", difficulty: 4, mastery: 0 },
+          Y: { code: "-.--", difficulty: 4, mastery: 0 },
+          Z: { code: "--..", difficulty: 4, mastery: 0 },
+
+          // Numbers
+          0: { code: "-----", difficulty: 2, mastery: 0 },
+          1: { code: ".----", difficulty: 2, mastery: 0 },
+          2: { code: "..---", difficulty: 2, mastery: 0 },
+          3: { code: "...--", difficulty: 2, mastery: 0 },
+          4: { code: "....-", difficulty: 2, mastery: 0 },
+          5: { code: ".....", difficulty: 2, mastery: 0 },
+          6: { code: "-....", difficulty: 2, mastery: 0 },
+          7: { code: "--...", difficulty: 2, mastery: 0 },
+          8: { code: "---..", difficulty: 2, mastery: 0 },
+          9: { code: "----.", difficulty: 2, mastery: 0 },
+
+          // Punctuation
+          ".": { code: ".-.-.-", difficulty: 5, mastery: 0 },
+          ",": { code: "--..--", difficulty: 5, mastery: 0 },
+          "?": { code: "..--..", difficulty: 5, mastery: 0 },
+          "'": { code: ".----.", difficulty: 5, mastery: 0 },
+          "!": { code: "-.-.--", difficulty: 5, mastery: 0 },
+          "/": { code: "-..-.", difficulty: 5, mastery: 0 },
+          "(": { code: "-.--.", difficulty: 5, mastery: 0 },
+          ")": { code: "-.--.-", difficulty: 5, mastery: 0 },
+          "&": { code: ".-...", difficulty: 5, mastery: 0 },
+          ":": { code: "---...", difficulty: 5, mastery: 0 },
+          ";": { code: "-.-.-.", difficulty: 5, mastery: 0 },
+          "=": { code: "-...-", difficulty: 5, mastery: 0 },
+          "+": { code: ".-.-.", difficulty: 5, mastery: 0 },
+          "-": { code: "-....-", difficulty: 5, mastery: 0 },
+          _: { code: "..--.-", difficulty: 5, mastery: 0 },
+          '"': { code: ".-..-.", difficulty: 5, mastery: 0 },
+          $: { code: "...-..-", difficulty: 5, mastery: 0 },
+          "@": { code: ".--.-.", difficulty: 5, mastery: 0 },
+          " ": { code: "/", difficulty: 1, mastery: 0 },
+        };
+
+        // Reverse Morse code lookup
+        const reverseMorse = {};
+        for (const key in morseData) {
+          reverseMorse[morseData[key].code] = key;
+        }
+
+        // User progress data
+        let userProgress = {
+          streak: 0,
+          lastPracticeDate: null,
+          totalCorrect: 0,
+          totalAnswered: 0,
+          todayCorrect: 0,
+          todayAnswered: 0,
+          xp: 0,
+          level: 1,
+          dailyGoal: 10,
+          characterMastery: {},
+          achievements: {
+            firstCorrect: false,
+            fiveStreak: false,
+            masterLetters: false,
+            levelFive: false,
+          },
+        };
+
+        // Practice session data
+        let practiceSession = {
+          currentMode: "text-to-morse",
+          currentDifficulty: "beginner",
+          currentQuestion: "",
+          currentAnswer: "",
+          questionsAnswered: 0,
+          questionsCorrect: 0,
+          hintShown: false,
+          lastAnswerCorrect: null,
+        };
+
+        // Audio context for Morse code sounds
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioContext();
+        let isPlaying = false;
+        let lastPlayedCode = "";
+
+        // Initialize the app
+        function initApp() {
+          // Load saved progress from localStorage
+          loadProgress();
+
+          // Set up UI elements
+          setupTabs();
+          populateMorseCharts();
+          setupPracticeMode();
+          setupTranslation();
+          setupProgressTab();
+
+          // Update UI with loaded data
+          updateStatsDisplay();
+          generatePracticeQuestion();
+
+          // Check if user practiced today to maintain streak
+          checkStreak();
+        }
+
+        // Tab functionality
+        function setupTabs() {
+          const tabBtns = document.querySelectorAll(".tab-btn");
+          const tabContents = document.querySelectorAll(".tab-content");
+
+          tabBtns.forEach((btn) => {
+            btn.addEventListener("click", () => {
+              const tabId = btn.getAttribute("data-tab");
+
+              // Update active tab button
+              tabBtns.forEach((b) => b.classList.remove("active"));
+              btn.classList.add("active");
+
+              // Update active tab content
+              tabContents.forEach((content) =>
+                content.classList.remove("active")
+              );
+              document.getElementById(tabId).classList.add("active");
+
+              // Special tab handling
+              if (tabId === "practice") {
+                generatePracticeQuestion();
+              } else if (tabId === "progress") {
+                updateProgressTab();
+              }
+            });
+          });
+        }
+
+        // Populate Morse code charts with interactive elements
+        function populateMorseCharts() {
+          const lettersChart = document.getElementById("letters-chart");
+          const numbersChart = document.getElementById("numbers-chart");
+          const punctuationChart = document.getElementById("punctuation-chart");
+
+          // Clear existing content
+          lettersChart.innerHTML = "";
+          numbersChart.innerHTML = "";
+          punctuationChart.innerHTML = "";
+
+          // Add letters
+          for (let i = 65; i <= 90; i++) {
+            const char = String.fromCharCode(i);
+            lettersChart.appendChild(createMorseItem(char, morseData[char]));
+          }
+
+          // Add numbers
+          for (let i = 0; i <= 9; i++) {
+            const char = i.toString();
+            numbersChart.appendChild(createMorseItem(char, morseData[char]));
+          }
+
+          // Add punctuation (filter out space)
+          const punctuation = Object.keys(morseData).filter(
+            (key) => key.length === 1 && !/[A-Z0-9]/.test(key) && key !== " "
+          );
+
+          punctuation.forEach((char) => {
+            punctuationChart.appendChild(
+              createMorseItem(char, morseData[char])
+            );
+          });
+
+          // Set up difficulty filter
+          const difficultyBtns = document.querySelectorAll(
+            ".difficulty-btn[data-difficulty]"
+          );
+          difficultyBtns.forEach((btn) => {
+            btn.addEventListener("click", function () {
+              difficultyBtns.forEach((b) => b.classList.remove("active"));
+              this.classList.add("active");
+
+              const difficulty = this.getAttribute("data-difficulty");
+              filterMorseChart(difficulty);
+            });
+          });
+        }
+
+        function createMorseItem(char, data) {
+          const item = document.createElement("div");
+          item.className = "morse-item";
+          item.setAttribute("data-char", char);
+          item.setAttribute("data-mastery", data.mastery || 0);
+
+          const charEl = document.createElement("div");
+          charEl.className = "morse-char";
+          charEl.textContent = char;
+
+          const codeEl = document.createElement("div");
+          codeEl.className = "morse-code";
+          codeEl.textContent = data.code;
+
+          // Add mastery indicator
+          const masteryEl = document.createElement("div");
+          masteryEl.className = "mastery-indicator";
+          masteryEl.style.width = "100%";
+          masteryEl.style.height = "4px";
+          masteryEl.style.backgroundColor = getMasteryColor(data.mastery || 0);
+          masteryEl.style.borderRadius = "0 0 8px 8px";
+          masteryEl.style.position = "absolute";
+          masteryEl.style.bottom = "0";
+          masteryEl.style.left = "0";
+
+          item.appendChild(charEl);
+          item.appendChild(codeEl);
+          item.appendChild(masteryEl);
+
+          // Add click event to play sound
+          item.addEventListener("click", function () {
+            playMorseCode(data.code, 15);
+
+            // Highlight the item temporarily
+            this.classList.add("active");
+            setTimeout(() => {
+              this.classList.remove("active");
+            }, 500);
+          });
+
+          return item;
+        }
+
+        function filterMorseChart(difficulty) {
+          const allItems = document.querySelectorAll(".morse-item");
+
+          allItems.forEach((item) => {
+            const char = item.getAttribute("data-char");
+            const data = morseData[char];
+
+            switch (difficulty) {
+              case "letters":
+                item.style.display = /[A-Z]/.test(char) ? "flex" : "none";
+                break;
+              case "numbers":
+                item.style.display = /[0-9]/.test(char) ? "flex" : "none";
+                break;
+              case "punctuation":
+                item.style.display =
+                  /[^A-Z0-9]/.test(char) && char !== " " ? "flex" : "none";
+                break;
+              default:
+                item.style.display = "flex";
+            }
+          });
+        }
+
+        function getMasteryColor(mastery) {
+          if (mastery >= 80) return "var(--success)";
+          if (mastery >= 50) return "var(--info)";
+          if (mastery >= 20) return "var(--warning)";
+          return "var(--danger)";
+        }
+
+        // Practice mode functionality
+        function setupPracticeMode() {
+          // Mode selection
+          const modeBtns = document.querySelectorAll(
+            ".practice-btn[data-mode]"
+          );
+          modeBtns.forEach((btn) => {
+            btn.addEventListener("click", function () {
+              modeBtns.forEach((b) => b.classList.remove("active"));
+              this.classList.add("active");
+              practiceSession.currentMode = this.getAttribute("data-mode");
+              practiceSession.hintShown = false;
+              document.getElementById("hint-area").style.display = "none";
+              generatePracticeQuestion();
+            });
+          });
+
+          // Difficulty selection
+          const difficultyBtns = document.querySelectorAll(
+            ".difficulty-btn[data-level]"
+          );
+          difficultyBtns.forEach((btn) => {
+            btn.addEventListener("click", function () {
+              difficultyBtns.forEach((b) => b.classList.remove("active"));
+              this.classList.add("active");
+              practiceSession.currentDifficulty =
+                this.getAttribute("data-level");
+              generatePracticeQuestion();
+            });
+          });
+
+          // Check answer button
+          document
+            .getElementById("check-answer")
+            .addEventListener("click", checkAnswer);
+
+          // Input field enter key
+          document
+            .getElementById("practice-input")
+            .addEventListener("keypress", function (e) {
+              if (e.key === "Enter") {
+                checkAnswer();
+              }
+            });
+
+          // Play question button
+          document
+            .getElementById("play-question")
+            .addEventListener("click", playQuestion);
+
+          // Repeat last button
+          document
+            .getElementById("repeat-last")
+            .addEventListener("click", function () {
+              if (lastPlayedCode) {
+                playMorseCode(
+                  lastPlayedCode,
+                  parseInt(document.getElementById("speed").value)
+                );
+              }
+            });
+
+          // Hint button
+          document
+            .getElementById("hint-btn")
+            .addEventListener("click", showHint);
+
+          // Speed control
+          const speedControl = document.getElementById("speed");
+          const speedValue = document.getElementById("speed-value");
+
+          speedControl.addEventListener("input", () => {
+            speedValue.textContent = `${speedControl.value} WPM`;
+          });
+        }
+
+        function generatePracticeQuestion() {
+          const questionEl = document.getElementById("practice-question");
+          const inputEl = document.getElementById("practice-input");
+          const feedbackEl = document.getElementById("practice-feedback");
+          const hintArea = document.getElementById("hint-area");
+
+          inputEl.value = "";
+          feedbackEl.textContent = "";
+          feedbackEl.className = "practice-feedback";
+          hintArea.style.display = "none";
+          practiceSession.hintShown = false;
+
+          // Determine which characters to include based on difficulty
+          let availableChars = [];
+
+          switch (practiceSession.currentDifficulty) {
+            case "beginner":
+              availableChars = Object.keys(morseData).filter((c) =>
+                /[A-Z]/.test(c)
+              );
+              break;
+            case "intermediate":
+              availableChars = Object.keys(morseData).filter((c) =>
+                /[A-Z0-9]/.test(c)
+              );
+              break;
+            case "advanced":
+              availableChars = Object.keys(morseData).filter((c) => c !== " ");
+              break;
+          }
+
+          if (practiceSession.currentMode === "text-to-morse") {
+            // Generate random character from available set
+            const randomChar =
+              availableChars[Math.floor(Math.random() * availableChars.length)];
+            questionEl.textContent = randomChar;
+            practiceSession.currentQuestion = randomChar;
+            practiceSession.currentAnswer = morseData[randomChar].code;
+          } else if (practiceSession.currentMode === "morse-to-text") {
+            // Generate random Morse code from available set
+            const randomChar =
+              availableChars[Math.floor(Math.random() * availableChars.length)];
+            questionEl.textContent = morseData[randomChar].code;
+            practiceSession.currentQuestion = morseData[randomChar].code;
+            practiceSession.currentAnswer = randomChar;
+          } else if (practiceSession.currentMode === "audio-recognition") {
+            // Generate random Morse code from available set (will be played)
+            const randomChar =
+              availableChars[Math.floor(Math.random() * availableChars.length)];
+            questionEl.textContent = "🔊 Listen to the sound";
+            practiceSession.currentQuestion = morseData[randomChar].code;
+            practiceSession.currentAnswer = randomChar;
+            playMorseCode(
+              practiceSession.currentQuestion,
+              parseInt(document.getElementById("speed").value)
+            );
+          }
+        }
+
+        function checkAnswer() {
+          const inputEl = document.getElementById("practice-input");
+          const feedbackEl = document.getElementById("practice-feedback");
+          const progressText = document.getElementById("progress-text");
+          const progressFill = document.getElementById("progress-fill");
+
+          const answer = inputEl.value.trim();
+
+          if (!answer) {
+            feedbackEl.textContent = "Please enter an answer";
+            feedbackEl.className = "practice-feedback incorrect";
+            feedbackEl.classList.add("shake");
+            setTimeout(() => feedbackEl.classList.remove("shake"), 500);
+            return;
+          }
+
+          let isCorrect = false;
+          if (practiceSession.currentMode === "text-to-morse") {
+            isCorrect =
+              answer.replace(/\s+/g, " ") === practiceSession.currentAnswer;
+          } else {
+            isCorrect =
+              answer.toUpperCase() ===
+              practiceSession.currentAnswer.toUpperCase();
+          }
+
+          // Update practice session
+          practiceSession.questionsAnswered++;
+          practiceSession.lastAnswerCorrect = isCorrect;
+
+          if (isCorrect) {
+            practiceSession.questionsCorrect++;
+
+            // Update user progress
+            userProgress.totalCorrect++;
+            userProgress.todayCorrect++;
+            userProgress.totalAnswered++;
+            userProgress.todayAnswered++;
+
+            // Update character mastery
+            if (
+              practiceSession.currentMode === "morse-to-text" ||
+              practiceSession.currentMode === "audio-recognition"
+            ) {
+              const char = practiceSession.currentAnswer;
+              if (!userProgress.characterMastery[char]) {
+                userProgress.characterMastery[char] = 0;
+              }
+              userProgress.characterMastery[char] = Math.min(
+                userProgress.characterMastery[char] + 10,
+                100
+              );
+            } else {
+              const code = practiceSession.currentAnswer;
+              const char = Object.keys(morseData).find(
+                (key) => morseData[key].code === code
+              );
+              if (char && !userProgress.characterMastery[char]) {
+                userProgress.characterMastery[char] = 0;
+              }
+              if (char) {
+                userProgress.characterMastery[char] = Math.min(
+                  userProgress.characterMastery[char] + 10,
+                  100
+                );
+              }
+            }
+
+            // Add XP
+            userProgress.xp += 10;
+            checkLevelUp();
+
+            // Update UI
+            feedbackEl.textContent = "Correct! 🎉";
+            feedbackEl.className = "practice-feedback correct";
+            feedbackEl.classList.add("pulse");
+
+            // Update progress bar
+            const progressPercent =
+              (practiceSession.questionsCorrect / 10) * 100;
+            progressFill.style.width = `${progressPercent}%`;
+            progressText.textContent = `${practiceSession.questionsCorrect}/10`;
+
+            // Generate new question after delay
+            setTimeout(() => {
+              feedbackEl.classList.remove("pulse");
+              generatePracticeQuestion();
+            }, 1500);
+          } else {
+            userProgress.totalAnswered++;
+            userProgress.todayAnswered++;
+
+            feedbackEl.textContent = `Incorrect. The correct answer is "${practiceSession.currentAnswer}"`;
+            feedbackEl.className = "practice-feedback incorrect";
+            document.getElementById("hint-area").style.display = "block";
+
+            // Show the correct answer briefly
+            setTimeout(() => {
+              generatePracticeQuestion();
+            }, 3000);
+          }
+
+          // Save progress and update stats
+          saveProgress();
+          updateStatsDisplay();
+        }
+
+        function showHint() {
+          if (practiceSession.hintShown) return;
+
+          const hintContent = document.getElementById("hint-content");
+          practiceSession.hintShown = true;
+
+          if (practiceSession.currentMode === "text-to-morse") {
+            const char = practiceSession.currentQuestion;
+            const code = morseData[char].code;
+
+            let hintText = `The Morse code for "${char}" is `;
+            for (let i = 0; i < code.length; i++) {
+              const symbol = code[i];
+              hintText += `${symbol} (${symbol === "." ? "dot" : "dash"})`;
+              if (i < code.length - 1) hintText += " + ";
+            }
+
+            hintContent.textContent = hintText;
+          } else {
+            const code = practiceSession.currentQuestion;
+            const char = reverseMorse[code];
+
+            if (char) {
+              hintContent.textContent = `The character "${char}" sounds like this: ${code}`;
+            } else {
+              hintContent.textContent =
+                "This Morse code represents a single character. Listen carefully to the rhythm.";
+            }
+          }
+        }
+
+        function playQuestion() {
+          if (isPlaying) return;
+
+          const question = practiceSession.currentQuestion;
+          const speed = parseInt(document.getElementById("speed").value);
+
+          if (practiceSession.currentMode === "audio-recognition") {
+            playMorseCode(question, speed);
+          } else if (practiceSession.currentMode === "text-to-morse") {
+            const char = practiceSession.currentQuestion;
+            playMorseCode(morseData[char].code, speed);
+          } else {
+            playMorseCode(question, speed);
+          }
+        }
+
+        // Translation functionality
+        function setupTranslation() {
+          // Translation buttons
+          document
+            .getElementById("text-to-morse-btn")
+            .addEventListener("click", textToMorse);
+          document
+            .getElementById("morse-to-text-btn")
+            .addEventListener("click", morseToText);
+          document
+            .getElementById("clear-btn")
+            .addEventListener("click", clearTranslation);
+          document
+            .getElementById("format-help-btn")
+            .addEventListener("click", showFormatHelp);
+
+          // Play text as Morse
+          document
+            .getElementById("play-text")
+            .addEventListener("click", playTextAsMorse);
+
+          // Speed control
+          const speedControl = document.getElementById("translation-speed");
+          const speedValue = document.getElementById("translation-speed-value");
+
+          speedControl.addEventListener("input", () => {
+            speedValue.textContent = `${speedControl.value} WPM`;
+          });
+
+          // Real-time translation as user types
+          document
+            .getElementById("text-input")
+            .addEventListener("input", debounce(textToMorse, 500));
+          document
+            .getElementById("morse-input")
+            .addEventListener("input", debounce(morseToText, 500));
+        }
+
+        function textToMorse() {
+          const textInput = document
+            .getElementById("text-input")
+            .value.toUpperCase();
+          let morseOutput = "";
+
+          for (const char of textInput) {
+            if (morseData[char]) {
+              morseOutput += morseData[char].code + " ";
+            } else if (char === " ") {
+              morseOutput += "/ ";
+            }
+          }
+
+          document.getElementById("morse-input").value = morseOutput.trim();
+        }
+
+        function morseToText() {
+          const morseInput = document
+            .getElementById("morse-input")
+            .value.trim();
+          const morseWords = morseInput.split("/");
+          let textOutput = "";
+
+          for (const word of morseWords) {
+            const letters = word.trim().split(" ");
+            for (const letter of letters) {
+              if (reverseMorse[letter]) {
+                textOutput += reverseMorse[letter];
+              }
+            }
+            textOutput += " ";
+          }
+
+          document.getElementById("text-input").value = textOutput.trim();
+        }
+
+        function clearTranslation() {
+          document.getElementById("text-input").value = "";
+          document.getElementById("morse-input").value = "";
+        }
+
+        function showFormatHelp() {
+          alert(
+            "Morse Code Format Help:\n\n" +
+              "- Use dots (.) and dashes (-) for Morse code\n" +
+              "- Separate letters with a single space\n" +
+              "- Separate words with a forward slash (/)\n" +
+              "Example: .... . .-.. .-.. --- / .-- --- .-. .-.. -.. (HELLO WORLD)"
+          );
+        }
+
+        function playTextAsMorse() {
+          if (isPlaying) return;
+
+          const textInput = document
+            .getElementById("text-input")
+            .value.toUpperCase();
+          const speed = parseInt(
+            document.getElementById("translation-speed").value
+          );
+          let morseString = "";
+
+          for (const char of textInput) {
+            if (morseData[char]) {
+              morseString += morseData[char].code + " ";
+            } else if (char === " ") {
+              morseString += "/ ";
+            }
+          }
+
+          playMorseCode(morseString.trim(), speed);
+        }
+
+        function debounce(func, wait) {
+          let timeout;
+          return function () {
+            const context = this,
+              args = arguments;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+              func.apply(context, args);
+            }, wait);
+          };
+        }
+
+        // Progress tracking functionality
+        function setupProgressTab() {
+          document
+            .getElementById("set-goal-btn")
+            .addEventListener("click", setDailyGoal);
+        }
+
+        function updateProgressTab() {
+          updateMasteryChart();
+          updateAchievements();
+          updateDailyGoalProgress();
+        }
+
+        function updateMasteryChart() {
+          const masteryChart = document.getElementById("mastery-chart");
+          masteryChart.innerHTML = "";
+
+          // Group characters by category
+          const letters = [];
+          const numbers = [];
+          const punctuation = [];
+
+          for (const char in morseData) {
+            if (char === " ") continue;
+
+            const mastery = userProgress.characterMastery[char] || 0;
+            const item = document.createElement("div");
+            item.className = "mastery-item";
+            item.innerHTML = `
+                        <div class="mastery-char">${char}</div>
+                        <div class="mastery-bar-container">
+                            <div class="mastery-bar" style="width: ${mastery}%; background-color: ${getMasteryColor(
+              mastery
+            )}"></div>
+                        </div>
+                        <div class="mastery-percent">${mastery}%</div>
+                    `;
+
+            if (/[A-Z]/.test(char)) letters.push(item);
+            else if (/[0-9]/.test(char)) numbers.push(item);
+            else punctuation.push(item);
+          }
+
+          // Add to chart with categories
+          if (letters.length > 0) {
+            const category = document.createElement("h4");
+            category.textContent = "Letters";
+            masteryChart.appendChild(category);
+            letters.forEach((item) => masteryChart.appendChild(item));
+          }
+
+          if (numbers.length > 0) {
+            const category = document.createElement("h4");
+            category.textContent = "Numbers";
+            masteryChart.appendChild(category);
+            numbers.forEach((item) => masteryChart.appendChild(item));
+          }
+
+          if (punctuation.length > 0) {
+            const category = document.createElement("h4");
+            category.textContent = "Punctuation";
+            masteryChart.appendChild(category);
+            punctuation.forEach((item) => masteryChart.appendChild(item));
+          }
+        }
+
+        function updateAchievements() {
+          const achievementsGrid = document.getElementById("achievements-grid");
+          achievementsGrid.innerHTML = "";
+
+          const achievements = [
+            {
+              id: "firstCorrect",
+              name: "First Success",
+              desc: "Get your first correct answer",
+              icon: "🥇",
+            },
+            {
+              id: "fiveStreak",
+              name: "5-Day Streak",
+              desc: "Practice for 5 days in a row",
+              icon: "🔥",
+            },
+            {
+              id: "masterLetters",
+              name: "Letter Master",
+              desc: "Achieve 80% mastery on all letters",
+              icon: "🔤",
+            },
+            {
+              id: "levelFive",
+              name: "Level 5",
+              desc: "Reach level 5 in your Morse journey",
+              icon: "🏆",
+            },
+          ];
+
+          achievements.forEach((ach) => {
+            const achieved = userProgress.achievements[ach.id] || false;
+            const item = document.createElement("div");
+            item.className = `achievement-item ${achieved ? "achieved" : ""}`;
+            item.innerHTML = `
+                        <div class="achievement-icon">${ach.icon}</div>
+                        <div class="achievement-info">
+                            <div class="achievement-name">${ach.name}</div>
+                            <div class="achievement-desc">${ach.desc}</div>
+                        </div>
+                        <div class="achievement-status">${
+                          achieved ? "✓ Unlocked" : "🔒 Locked"
+                        }</div>
+                    `;
+            achievementsGrid.appendChild(item);
+          });
+        }
+
+        function updateDailyGoalProgress() {
+          const progress = document.getElementById("daily-goal-progress");
+          const progressText = document.getElementById("daily-goal-text");
+          const percent = Math.min(
+            (userProgress.todayCorrect / userProgress.dailyGoal) * 100,
+            100
+          );
+
+          progress.style.width = `${percent}%`;
+          progressText.textContent = `${userProgress.todayCorrect}/${userProgress.dailyGoal} correct answers today`;
+        }
+
+        function setDailyGoal() {
+          const newGoal = prompt(
+            "Set your daily practice goal (number of correct answers):",
+            userProgress.dailyGoal
+          );
+          if (newGoal && !isNaN(newGoal) && parseInt(newGoal) > 0) {
+            userProgress.dailyGoal = parseInt(newGoal);
+            saveProgress();
+            updateDailyGoalProgress();
+          }
+        }
+
+        function checkLevelUp() {
+          const xpNeeded = userProgress.level * 100;
+          if (userProgress.xp >= xpNeeded) {
+            userProgress.level++;
+            userProgress.xp = userProgress.xp - xpNeeded;
+
+            // Check for level achievement
+            if (
+              userProgress.level >= 5 &&
+              !userProgress.achievements.levelFive
+            ) {
+              userProgress.achievements.levelFive = true;
+              showNotification(`Achievement Unlocked: Level 5!`);
+            }
+
+            showNotification(
+              `Level Up! You are now level ${userProgress.level}`
+            );
+            saveProgress();
+            updateStatsDisplay();
+          }
+        }
+
+        function showNotification(message) {
+          const notification = document.createElement("div");
+          notification.className = "notification";
+          notification.textContent = message;
+          notification.style.position = "fixed";
+          notification.style.bottom = "20px";
+          notification.style.right = "20px";
+          notification.style.backgroundColor = "var(--success)";
+          notification.style.color = "white";
+          notification.style.padding = "15px 25px";
+          notification.style.borderRadius = "8px";
+          notification.style.boxShadow = "0 4px 8px rgba(0,0,0,0.2)";
+          notification.style.zIndex = "1000";
+          notification.style.animation = "slideIn 0.3s, fadeOut 0.5s 2.5s";
+
+          document.body.appendChild(notification);
+          setTimeout(() => {
+            notification.remove();
+          }, 3000);
+        }
+
+        // Audio functions
+        function playMorseCode(morseString, wpm = 15) {
+          if (!morseString || isPlaying) return;
+
+          lastPlayedCode = morseString;
+          isPlaying = true;
+          const dotDuration = 1.2 / wpm; // Standard timing for Morse code
+          const dashDuration = 3 * dotDuration;
+          const symbolSpace = dotDuration;
+          const letterSpace = 3 * dotDuration - symbolSpace; // Already has space after each symbol
+          const wordSpace = 7 * dotDuration - letterSpace; // Already has space after each letter
+
+          let time = audioCtx.currentTime + 0.1; // Short delay before starting
+
+          for (const char of morseString) {
+            if (char === ".") {
+              playBeep(time, dotDuration);
+              time += dotDuration + symbolSpace;
+            } else if (char === "-") {
+              playBeep(time, dashDuration);
+              time += dashDuration + symbolSpace;
+            } else if (char === " ") {
+              time += letterSpace;
+            } else if (char === "/") {
+              time += wordSpace;
+            }
+          }
+
+          setTimeout(() => {
+            isPlaying = false;
+          }, (time - audioCtx.currentTime) * 1000);
+        }
+
+        function playBeep(startTime, duration) {
+          const oscillator = audioCtx.createOscillator();
+          const gainNode = audioCtx.createGain();
+
+          oscillator.type = "sine";
+          oscillator.frequency.value = 700;
+          oscillator.connect(gainNode);
+          gainNode.connect(audioCtx.destination);
+
+          oscillator.start(startTime);
+          oscillator.stop(startTime + duration);
+
+          // Apply a quick fade out to avoid clicks
+          gainNode.gain.setValueAtTime(0.3, startTime);
+          gainNode.gain.exponentialRampToValueAtTime(
+            0.001,
+            startTime + duration
+          );
+        }
+
+        // Progress persistence
+        function loadProgress() {
+          const savedProgress = localStorage.getItem("morseCodeMasterProgress");
+          if (savedProgress) {
+            userProgress = JSON.parse(savedProgress);
+
+            // Check if last practice was yesterday to maintain streak
+            const today = new Date().toDateString();
+            if (userProgress.lastPracticeDate !== today) {
+              // Check if it was yesterday (for streak)
+              const lastDate = new Date(userProgress.lastPracticeDate);
+              const yesterday = new Date();
+              yesterday.setDate(yesterday.getDate() - 1);
+
+              if (lastDate.toDateString() !== yesterday.toDateString()) {
+                // Broken streak
+                userProgress.streak = 0;
+              }
+            }
+          }
+        }
+
+        function saveProgress() {
+          const today = new Date().toDateString();
+          userProgress.lastPracticeDate = today;
+          localStorage.setItem(
+            "morseCodeMasterProgress",
+            JSON.stringify(userProgress)
+          );
+        }
+
+        function checkStreak() {
+          const today = new Date().toDateString();
+          if (userProgress.lastPracticeDate !== today) {
+            // Reset today's counts if it's a new day
+            userProgress.todayCorrect = 0;
+            userProgress.todayAnswered = 0;
+          }
+        }
+
+        function updateStatsDisplay() {
+          document.getElementById("streak-count").textContent =
+            userProgress.streak;
+          document.getElementById("total-correct").textContent =
+            userProgress.totalCorrect;
+          document.getElementById("today-correct").textContent =
+            userProgress.todayCorrect;
+          document.getElementById("current-streak").textContent =
+            userProgress.streak;
+          document.getElementById("total-answered").textContent =
+            userProgress.totalAnswered;
+
+          const accuracy =
+            userProgress.totalAnswered > 0
+              ? Math.round(
+                  (userProgress.totalCorrect / userProgress.totalAnswered) * 100
+                )
+              : 0;
+          document.getElementById("accuracy-rate").textContent = `${accuracy}%`;
+
+          document.getElementById("level-display").textContent =
+            userProgress.level;
+          const xpNeeded = userProgress.level * 100;
+          document.getElementById(
+            "xp-display"
+          ).textContent = `${userProgress.xp}/${xpNeeded}`;
+        }
+
+        // Initialize the application
+        initApp();
+      });
+    </script>
+  </body>
+</html>
